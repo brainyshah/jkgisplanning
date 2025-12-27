@@ -1,319 +1,401 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Vendor Details (One Per Page)</title>
+<meta charset="utf-8" />
+<title>KML + Geotag KML Viewer</title>
+
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <style>
-@page {
-    size: A4;
-    margin: 16mm;
-}
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, sans-serif; }
 
-/* ===== CSS VARIABLES (FIGMA STYLE) ===== */
-:root {
-    --radius: 16px;
-    --border: 4px solid #000;
-    --shadow-soft: 0 10px 30px rgba(0,0,0,0.15);
-    --shadow-hover: 0 18px 40px rgba(0,0,0,0.25);
-    --transition-fast: 0.25s ease;
-    --transition-slow: 0.45s cubic-bezier(.4,0,.2,1);
-}
+  #container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+  }
 
-/* ===== BASE ===== */
-body {
-    font-family: "Inter", "Segoe UI", Arial, sans-serif;
-    background: #f8fafc;
+  /* Left sidebar */
+  #sidebar {
+    width: 260px;
+    background: #f5a623;
     color: #000;
+    overflow-y: auto;
+  }
+
+  .panel-section {
+    border-bottom: 1px solid #e2e2e2;
+  }
+
+  .panel-header {
+    padding: 8px 10px;
+    font-weight: bold;
+    background: #f5a623;
+  }
+
+  .panel-body {
+    background: #fff;
+    padding: 8px 10px;
+  }
+
+  .panel-body label {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .upload-input {
+    width: 100%;
+  }
+
+  /* Legend styles */
+  #kmlLegend,
+  #geotagLegend {
+    list-style: none;
     margin: 0;
     padding: 0;
-}
+    max-height: 200px;
+    overflow-y: auto;
+  }
 
-/* ===== PAGE CARD ===== */
-.vendor-page {
-    page-break-after: always;
-    padding: 22px;
-    border-radius: var(--radius);
-    border: var(--border);
-    background: #ffffff;
-    box-shadow: var(--shadow-soft);
-    transition: transform var(--transition-slow), box-shadow var(--transition-slow);
-}
+  #kmlLegend li,
+  #geotagLegend li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+    font-size: 13px;
+  }
 
-/* Hover card effect (screen only) */
-.vendor-page:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: var(--shadow-hover);
-}
+  .legend-color-box {
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+    border: 1px solid #555;
+  }
 
-/* ===== HEADER ===== */
-h1 {
-    text-align: center;
-    font-size: 30px;
-    margin-bottom: 18px;
-    font-weight: 900;
-    letter-spacing: 1px;
-    position: relative;
-}
-
-h1::after {
-    content: "";
-    display: block;
-    width: 80px;
-    height: 4px;
-    background: #000;
-    margin: 10px auto 0;
-    border-radius: 2px;
-}
-
-/* ===== TABLE ===== */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 18px;
-    font-weight: 800;
-}
-
-th, td {
-    padding: 12px 14px;
-    border: 2px solid #000;
-    transition: background var(--transition-fast), transform var(--transition-fast);
-}
-
-/* ===== ROW INTERACTION ===== */
-tr {
-    cursor: pointer;
-}
-
-tr:hover td {
-    filter: brightness(0.96);
-    transform: scale(1.01);
-}
-
-/* Clicked row (JS adds .active-row) */
-.active-row td {
-    outline: 3px solid #000;
-    outline-offset: -3px;
-}
-
-/* ===== RANDOM-LOOK COLOR ROWS ===== */
-tr:nth-child(1) th { background: #fde68a; }
-tr:nth-child(1) td { background: #fef3c7; }
-
-tr:nth-child(2) th { background: #bfdbfe; }
-tr:nth-child(2) td { background: #dbeafe; }
-
-tr:nth-child(3) th { background: #fbcfe8; }
-tr:nth-child(3) td { background: #fce7f3; }
-
-tr:nth-child(4) th { background: #bbf7d0; }
-tr:nth-child(4) td { background: #dcfce7; }
-
-tr:nth-child(5) th { background: #fecaca; }
-tr:nth-child(5) td { background: #fee2e2; }
-
-tr:nth-child(6) th { background: #ddd6fe; }
-tr:nth-child(6) td { background: #ede9fe; }
-
-tr:nth-child(7) th { background: #fde68a; }
-tr:nth-child(7) td { background: #fef3c7; }
-
-tr:nth-child(8) th { background: #bfdbfe; }
-tr:nth-child(8) td { background: #dbeafe; }
-
-tr:nth-child(9) th { background: #fbcfe8; }
-tr:nth-child(9) td { background: #fce7f3; }
-
-tr:nth-child(10) th { background: #bbf7d0; }
-tr:nth-child(10) td { background: #dcfce7; }
-
-tr:nth-child(11) th { background: #fecaca; }
-tr:nth-child(11) td { background: #fee2e2; }
-
-tr:nth-child(12) th { background: #ddd6fe; }
-tr:nth-child(12) td { background: #ede9fe; }
-
-/* ===== THEME BORDER COLORS ===== */
-.theme-1 { border-color: #f59e0b; }
-.theme-2 { border-color: #0ea5e9; }
-.theme-3 { border-color: #ec4899; }
-.theme-4 { border-color: #6366f1; }
-.theme-5 { border-color: #22c55e; }
-.theme-6 { border-color: #a855f7; }
-.theme-7 { border-color: #fb923c; }
-
-/* ===== DARK MODE (SCREEN ONLY) ===== */
-body.dark {
-    background: #020617;
-    color: #f8fafc;
-}
-
-body.dark .vendor-page {
-    background: #020617;
-    border-color: #f8fafc;
-}
-
-body.dark th, 
-body.dark td {
-    border-color: #f8fafc;
-}
-
-/* ===== PRINT SAFETY ===== */
-@media print {
-    body {
-        background: #ffffff !important;
-    }
-
-    .vendor-page {
-        box-shadow: none;
-        transform: none !important;
-        border-radius: 0;
-    }
-
-    tr:hover td,
-    .active-row td {
-        outline: none;
-        transform: none;
-    }
-}
+  /* Map */
+  #map {
+    flex: 1;
+  }
 </style>
-
 </head>
-
 <body>
 
-<!-- ================= VENDOR 2 ================= -->
-<div class="vendor-page theme-1">
-<h1>Vendor Details</h1>
-<table>
-<tr><th>Serial Number</th><td>2</td></tr>
-<tr><th>Vendor Name</th><td>ARHAAM ENTERPRISES</td></tr>
-<tr><th>GSTIN</th><td>01BDDPA3679J1ZT</td></tr>
-<tr><th>PAN Number</th><td>BDDPA3679J</td></tr>
-<tr><th>Aadhaar Number</th><td>5094 2801 6155</td></tr>
-<tr><th>Mobile Number</th><td>6006353667</td></tr>
-<tr><th>Gender</th><td>Female</td></tr>
-<tr><th>District</th><td>Srinagar</td></tr>
-<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
-<tr><th>IFSC Code</th><td>JAKAOCHANPO</td></tr>
-<tr><th>Account Number</th><td>0200010100003033</td></tr>
-<tr><th>Account Name</th><td>ARHAAM ENTERPRISES</td></tr>
-</table>
+<div id="container">
+  <!-- LEFT PANEL -->
+  <div id="sidebar">
+    <!-- Base Maps -->
+    <div class="panel-section">
+      <div class="panel-header">Base Maps</div>
+      <div class="panel-body" id="basemapPanel">
+        <label>
+          <input type="radio" name="basemap" value="osm" checked>
+          OpenStreetMap
+        </label>
+        <label>
+          <input type="radio" name="basemap" value="gstreet">
+          Google Streets
+        </label>
+        <label>
+          <input type="radio" name="basemap" value="gsat">
+          Google Satellite
+        </label>
+        <label>
+          <input type="radio" name="basemap" value="dark">
+          Dark (Carto)
+        </label>
+        <label>
+          <input type="radio" name="basemap" value="bhuvan_base">
+          Bhuvan Imagery (placeholder)
+        </label>
+        <label>
+          <input type="radio" name="basemap" value="bhuvan_lulc">
+          Bhuvan LULC 50K (2015‑16)
+        </label>
+      </div>
+    </div>
+
+    <!-- Upload KML -->
+    <div class="panel-section">
+      <div class="panel-header">Upload KML Files</div>
+      <div class="panel-body">
+        <input type="file" id="kmlInput" class="upload-input"
+               multiple accept=".kml" />
+      </div>
+    </div>
+
+    <!-- KML Legend -->
+    <div class="panel-section">
+      <div class="panel-header">KML Layers</div>
+      <div class="panel-body">
+        <ul id="kmlLegend"></ul>
+      </div>
+    </div>
+
+    <!-- Upload Geotag KML -->
+    <div class="panel-section">
+      <div class="panel-header">Upload Geotag Files</div>
+      <div class="panel-body">
+        <input type="file" id="geotagInput" class="upload-input"
+               multiple accept=".kml" />
+      </div>
+    </div>
+
+    <!-- Geotag legend -->
+    <div class="panel-section">
+      <div class="panel-header">Geotag Layers</div>
+      <div class="panel-body">
+        <ul id="geotagLegend"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div id="map"></div>
 </div>
 
-<!-- ================= VENDOR 3 ================= -->
-<div class="vendor-page theme-2">
-<h1>Vendor Details</h1>
-<table>
-<tr><th>Serial Number</th><td>3</td></tr>
-<tr><th>Vendor Name</th><td>BARAKAH ENTERPRISES</td></tr>
-<tr><th>GSTIN</th><td>01AHOPY1754C1ZE</td></tr>
-<tr><th>PAN Number</th><td>AHOPY1754C</td></tr>
-<tr><th>Aadhaar Number</th><td>3147 3825 0888</td></tr>
-<tr><th>Mobile Number</th><td>7780854759</td></tr>
-<tr><th>Gender</th><td>Female</td></tr>
-<tr><th>District</th><td>Budgam</td></tr>
-<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
-<tr><th>IFSC Code</th><td>JAKAOSTREET</td></tr>
-<tr><th>Account Number</th><td>0067010100004517</td></tr>
-<tr><th>Account Name</th><td>BARAKAH ENTERPRISES</td></tr>
-</table>
-</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
 
-<!-- ================= VENDOR 4 ================= -->
-<div class="vendor-page theme-3">
-<h1>Vendor Details</h1>
-<table>
-<tr><th>Serial Number</th><td>4</td></tr>
-<tr><th>Vendor Name</th><td>FATIMA GOODS AND SERVICES</td></tr>
-<tr><th>GSTIN</th><td>01AMOPB7256M1ZW</td></tr>
-<tr><th>PAN Number</th><td>AMOPB7256M</td></tr>
-<tr><th>Aadhaar Number</th><td>2756 8550 5044</td></tr>
-<tr><th>Mobile Number</th><td>7889417852</td></tr>
-<tr><th>Gender</th><td>Male</td></tr>
-<tr><th>District</th><td>Pulwama</td></tr>
-<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
-<tr><th>IFSC Code</th><td>JAKAOCHANPO</td></tr>
-<tr><th>Account Number</th><td>0200010100003123</td></tr>
-<tr><th>Account Name</th><td>FATIMA GOODS AND SERVICES</td></tr>
-</table>
-</div>
+<script>
+/* ===============================
+   MAP INIT
+================================ */
+const map = L.map('map', {
+  center: [23.5, 80.5],
+  zoom: 5,
+  preferCanvas: true,
+  zoomAnimation: true,
+  fadeAnimation: false,
+  markerZoomAnimation: false,
+  zoomSnap: 0.25,
+  zoomDelta: 0.5
+});
 
-<!-- ================= VENDOR 5 ================= -->
-<div class="vendor-page theme-4">
-<h1>Vendor Details</h1>
-<table>
-<tr><th>Serial Number</th><td>5</td></tr>
-<tr><th>Vendor Name</th><td>PINNACLE ENTERPRISES</td></tr>
-<tr><th>GSTIN</th><td>01AWOPY3084E1ZC</td></tr>
-<tr><th>PAN Number</th><td>AWOPY3084E</td></tr>
-<tr><th>Aadhaar Number</th><td>4355 9800 6715</td></tr>
-<tr><th>Mobile Number</th><td>7889830330</td></tr>
-<tr><th>Gender</th><td>Female</td></tr>
-<tr><th>District</th><td>Srinagar</td></tr>
-<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
-<tr><th>IFSC Code</th><td>JAKAOBOTSHA</td></tr>
-<tr><th>Account Number</th><td>0346010100006145</td></tr>
-<tr><th>Account Name</th><td>PINNACLE ENTERPRISES</td></tr>
-</table>
-</div>
+/* ===============================
+   BASEMAPS
+================================ */
+const baseLayers = {
+  osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 20
+  }),
+  gstreet: L.tileLayer(
+    'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0','mt1','mt2','mt3']
+    }
+  ),
+  gsat: L.tileLayer(
+    'https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0','mt1','mt2','mt3']
+    }
+  ),
+  dark: L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 20
+    }
+  ),
+  // placeholder: replace with actual Bhuvan base URL if available
+  bhuvan_base: L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 20
+    }
+  )
+};
 
-<!-- ================= VENDOR 6 ================= -->
-<div class="vendor-page theme-5">
-<h1>Vendor Details</h1>
-<table>
-<tr><th>Serial Number</th><td>6</td></tr>
-<tr><th>Vendor Name</th><td>RADIANT TECHNOLOGY</td></tr>
-<tr><th>GSTIN</th><td>01CUJPR2547C1ZW</td></tr>
-<tr><th>PAN Number</th><td>CUJPR2547C</td></tr>
-<tr><th>Aadhaar Number</th><td>7795 3061 4983</td></tr>
-<tr><th>Mobile Number</th><td>8082759165</td></tr>
-<tr><th>Gender</th><td>Male</td></tr>
-<tr><th>District</th><td>Srinagar</td></tr>
-<tr><th>Bank Name</th><td>State Bank of India</td></tr>
-<tr><th>IFSC Code</th><td>SBIN0002384</td></tr>
-<tr><th>Account Number</th><td>41762703013</td></tr>
-<tr><th>Account Name</th><td>RADIANT TECHNOLOGY</td></tr>
-</table>
-</div>
+// Bhuvan LULC (WMS)
+const bhuvanLULC = L.tileLayer.wms(
+  'https://bhuvan-vec2.nrsc.gov.in/bhuvan/wms',
+  {
+    layers: 'lulc:JK_LULC50K_1516',
+    format: 'image/png',
+    transparent: true,
+    version: '1.1.1'
+  }
+);
+baseLayers.bhuvan_lulc = bhuvanLULC;
 
-<!-- ================= VENDOR 7 ================= -->
-<div class="vendor-page theme-6">
-<h1>Vendor Details</h1>
-<table>
-<tr><th>Serial Number</th><td>7</td></tr>
-<tr><th>Vendor Name</th><td>SAALIM ENTERPRISES</td></tr>
-<tr><th>GSTIN</th><td>01AJFPH2666H1ZK</td></tr>
-<tr><th>PAN Number</th><td>AJFPH2666H</td></tr>
-<tr><th>Aadhaar Number</th><td>3894 2864 4853</td></tr>
-<tr><th>Mobile Number</th><td>9796551055</td></tr>
-<tr><th>Gender</th><td>Male</td></tr>
-<tr><th>District</th><td>Srinagar</td></tr>
-<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
-<tr><th>IFSC Code</th><td>JAKAOCOLLEG</td></tr>
-<tr><th>Account Number</th><td>0363020100000415</td></tr>
-<tr><th>Account Name</th><td>SAALIM ENTERPRISES</td></tr>
-</table>
-</div>
+// Default basemap
+baseLayers.osm.addTo(map);
+let currentBase = baseLayers.osm;
 
-<!-- ================= VENDOR 8 ================= -->
-<div class="vendor-page theme-7">
-<h1>Vendor Details</h1>
-<table>
-<tr><th>Serial Number</th><td>8</td></tr>
-<tr><th>Vendor Name</th><td>IFAAN CORPORATION</td></tr>
-<tr><th>GSTIN</th><td>01CCOPM1433R1ZB</td></tr>
-<tr><th>PAN Number</th><td>CCOPM1433R</td></tr>
-<tr><th>Aadhaar Number</th><td>4627 2210 8563</td></tr>
-<tr><th>Mobile Number</th><td>7006453330</td></tr>
-<tr><th>Gender</th><td>Male</td></tr>
-<tr><th>District</th><td>Bandipora</td></tr>
-<tr><th>Bank Name</th><td>Jammu and Kashmir Grameen Bank</td></tr>
-<tr><th>IFSC Code</th><td>JAKAOGRAMEN</td></tr>
-<tr><th>Account Number</th><td>3532010100000317</td></tr>
-<tr><th>Account Name</th><td>IFAAN CORPORATION</td></tr>
-</table>
-</div>
+// Base-map radio change
+document.getElementById('basemapPanel').addEventListener('change', e => {
+  if (e.target.name === 'basemap') {
+    const val = e.target.value;
+    if (baseLayers[val] && baseLayers[val] !== currentBase) {
+      map.removeLayer(currentBase);
+      currentBase = baseLayers[val];
+      currentBase.addTo(map);
+    }
+  }
+});
+
+/* ===============================
+   COMMON HELPERS
+================================ */
+function randomColor() {
+  return `hsl(${Math.random() * 360}, 70%, 50%)`;
+}
+
+/* ===============================
+   KML HANDLING (main KMLs)
+================================ */
+const kmlGroup = L.featureGroup().addTo(map);
+const kmlLegendList = document.getElementById('kmlLegend');
+
+function addKmlLegendEntry(fileName, color) {
+  const li = document.createElement('li');
+  const box = document.createElement('span');
+  box.className = 'legend-color-box';
+  box.style.backgroundColor = color;
+  li.appendChild(box);
+  li.appendChild(document.createTextNode(fileName));
+  kmlLegendList.appendChild(li);
+}
+
+function loadKML(file) {
+  const url = URL.createObjectURL(file);
+  const color = randomColor();
+
+  const layer = L.geoJSON(null, {
+    renderer: L.canvas(),
+    style: () => ({
+      color: color,
+      weight: 2,
+      fillOpacity: 0.4
+    }),
+    pointToLayer: (f, latlng) =>
+      L.circleMarker(latlng, {
+        radius: 5,
+        color: color,
+        fillOpacity: 0.9
+      }),
+    onEachFeature: function (feature, lyr) {
+      const html = `
+        <div style="display:flex;align-items:center;">
+          <span style="
+            width:14px;height:14px;
+            border:1px solid #555;
+            background:${color};
+            margin-right:6px;
+          "></span>
+          <span>${file.name}</span>
+        </div>`;
+      lyr.on('click', e2 => {
+        L.popup()
+          .setLatLng(e2.latlng)
+          .setContent(html)
+          .openOn(map);
+      });
+    }
+  });
+
+  omnivore.kml(url, null, layer)
+    .on('ready', function () {
+      kmlGroup.addLayer(this);
+      map.fitBounds(kmlGroup.getBounds(), {
+        padding: [30, 30],
+        animate: true
+      });
+      addKmlLegendEntry(file.name, color);
+      URL.revokeObjectURL(url);
+    })
+    .on('error', () => {
+      alert('Failed to load ' + file.name);
+      URL.revokeObjectURL(url);
+    });
+}
+
+document.getElementById('kmlInput').addEventListener('change', e => {
+  [...e.target.files].forEach(loadKML);
+});
+
+/* ===============================
+   GEOTAG KML HANDLING
+================================ */
+/* ===============================
+   GEOTAG KML HANDLING (red pins)
+================================ */
+const geotagGroup = L.featureGroup().addTo(map);
+const geotagLegendList = document.getElementById('geotagLegend');
+
+function addGeotagLegendEntry(fileName) {
+  const li = document.createElement('li');
+  const box = document.createElement('span');
+  box.className = 'legend-color-box';
+  box.style.backgroundColor = '#ff0000';
+  li.appendChild(box);
+  li.appendChild(document.createTextNode(fileName));
+  geotagLegendList.appendChild(li);
+}
+
+function loadGeotagKML(file) {
+  const url = URL.createObjectURL(file);
+
+  // 🔴 local red pin icon (same folder as index.html)
+  const redPin = L.icon({
+    iconUrl: 'red.png',          // <‑‑ relative path, NOT D:\...
+    iconSize:   [25, 41],        // set to your PNG size
+    iconAnchor: [12, 41],
+    popupAnchor:[1, -34],
+    shadowUrl:  'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    shadowSize: [41, 41]
+  });
+
+  const layer = L.geoJSON(null, {
+    renderer: L.canvas(),
+    style: () => ({
+      color: '#ff0000',
+      weight: 2,
+      fillOpacity: 0
+    }),
+    pointToLayer: (feature, latlng) =>
+      L.marker(latlng, { icon: redPin }),
+    onEachFeature: function (feature, lyr) {
+      const html = `
+        <div style="display:flex;align-items:center;">
+          <span style="
+            width:14px;height:14px;
+            border:1px solid #555;
+            background:#ff0000;
+            margin-right:6px;
+          "></span>
+          <span>${file.name}</span>
+        </div>`;
+      lyr.on('click', e2 => {
+        L.popup()
+          .setLatLng(e2.latlng)
+          .setContent(html)
+          .openOn(map);
+      });
+    }
+  });
+
+  omnivore.kml(url, null, layer)
+    .on('ready', function () {
+      geotagGroup.addLayer(this);
+      map.fitBounds(geotagGroup.getBounds(), {
+        padding: [30, 30],
+        animate: true
+      });
+      addGeotagLegendEntry(file.name, '#ff0000');
+      URL.revokeObjectURL(url);
+    })
+    .on('error', () => {
+      alert('Failed to load geotag KML: ' + file.name);
+      URL.revokeObjectURL(url);
+    });
+}
+
+document.getElementById('geotagInput').addEventListener('change', e => {
+  [...e.target.files].forEach(loadGeotagKML);
+});
+
+
+</script>
 
 </body>
 </html>
