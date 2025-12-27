@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vendor Details (One Per Page)</title>
+
+<style>
+@page {
+    size: A4;
+    margin: 16mm;
+}
+
+/* ===== CSS VARIABLES (FIGMA STYLE) ===== */
+:root {
+    --radius: 16px;
+    --border: 4px solid #000;
+    --shadow-soft: 0 10px 30px rgba(0,0,0,0.15);
+    --shadow-hover: 0 18px 40px rgba(0,0,0,0.25);
+    --transition-fast: 0.25s ease;
+    --transition-slow: 0.45s cubic-bezier(.4,0,.2,1);
+}
+
+/* ===== BASE ===== */
+body {
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    background: #f8fafc;
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== PAGE CARD ===== */
+.vendor-page {
+    page-break-after: always;
+    padding: 22px;
+    border-radius: var(--radius);
+    border: var(--border);
+    background: #ffffff;
+    box-shadow: var(--shadow-soft);
+    transition: transform var(--transition-slow), box-shadow var(--transition-slow);
+}
+
+/* Hover card effect (screen only) */
+.vendor-page:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--shadow-hover);
+}
+
+/* ===== HEADER ===== */
+h1 {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 18px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    position: relative;
+}
+
+h1::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: #000;
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+th, td {
+    padding: 12px 14px;
+    border: 2px solid #000;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+/* ===== ROW INTERACTION ===== */
+tr {
+    cursor: pointer;
+}
+
+tr:hover td {
+    filter: brightness(0.96);
+    transform: scale(1.01);
+}
+
+/* Clicked row (JS adds .active-row) */
+.active-row td {
+    outline: 3px solid #000;
+    outline-offset: -3px;
+}
+
+/* ===== RANDOM-LOOK COLOR ROWS ===== */
+tr:nth-child(1) th { background: #fde68a; }
+tr:nth-child(1) td { background: #fef3c7; }
+
+tr:nth-child(2) th { background: #bfdbfe; }
+tr:nth-child(2) td { background: #dbeafe; }
+
+tr:nth-child(3) th { background: #fbcfe8; }
+tr:nth-child(3) td { background: #fce7f3; }
+
+tr:nth-child(4) th { background: #bbf7d0; }
+tr:nth-child(4) td { background: #dcfce7; }
+
+tr:nth-child(5) th { background: #fecaca; }
+tr:nth-child(5) td { background: #fee2e2; }
+
+tr:nth-child(6) th { background: #ddd6fe; }
+tr:nth-child(6) td { background: #ede9fe; }
+
+tr:nth-child(7) th { background: #fde68a; }
+tr:nth-child(7) td { background: #fef3c7; }
+
+tr:nth-child(8) th { background: #bfdbfe; }
+tr:nth-child(8) td { background: #dbeafe; }
+
+tr:nth-child(9) th { background: #fbcfe8; }
+tr:nth-child(9) td { background: #fce7f3; }
+
+tr:nth-child(10) th { background: #bbf7d0; }
+tr:nth-child(10) td { background: #dcfce7; }
+
+tr:nth-child(11) th { background: #fecaca; }
+tr:nth-child(11) td { background: #fee2e2; }
+
+tr:nth-child(12) th { background: #ddd6fe; }
+tr:nth-child(12) td { background: #ede9fe; }
+
+/* ===== THEME BORDER COLORS ===== */
+.theme-1 { border-color: #f59e0b; }
+.theme-2 { border-color: #0ea5e9; }
+.theme-3 { border-color: #ec4899; }
+.theme-4 { border-color: #6366f1; }
+.theme-5 { border-color: #22c55e; }
+.theme-6 { border-color: #a855f7; }
+.theme-7 { border-color: #fb923c; }
+
+/* ===== DARK MODE (SCREEN ONLY) ===== */
+body.dark {
+    background: #020617;
+    color: #f8fafc;
+}
+
+body.dark .vendor-page {
+    background: #020617;
+    border-color: #f8fafc;
+}
+
+body.dark th, 
+body.dark td {
+    border-color: #f8fafc;
+}
+
+/* ===== PRINT SAFETY ===== */
+@media print {
+    body {
+        background: #ffffff !important;
+    }
+
+    .vendor-page {
+        box-shadow: none;
+        transform: none !important;
+        border-radius: 0;
+    }
+
+    tr:hover td,
+    .active-row td {
+        outline: none;
+        transform: none;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- ================= VENDOR 2 ================= -->
+<div class="vendor-page theme-1">
+<h1>Vendor Details</h1>
+<table>
+<tr><th>Serial Number</th><td>2</td></tr>
+<tr><th>Vendor Name</th><td>ARHAAM ENTERPRISES</td></tr>
+<tr><th>GSTIN</th><td>01BDDPA3679J1ZT</td></tr>
+<tr><th>PAN Number</th><td>BDDPA3679J</td></tr>
+<tr><th>Aadhaar Number</th><td>5094 2801 6155</td></tr>
+<tr><th>Mobile Number</th><td>6006353667</td></tr>
+<tr><th>Gender</th><td>Female</td></tr>
+<tr><th>District</th><td>Srinagar</td></tr>
+<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
+<tr><th>IFSC Code</th><td>JAKAOCHANPO</td></tr>
+<tr><th>Account Number</th><td>0200010100003033</td></tr>
+<tr><th>Account Name</th><td>ARHAAM ENTERPRISES</td></tr>
+</table>
+</div>
+
+<!-- ================= VENDOR 3 ================= -->
+<div class="vendor-page theme-2">
+<h1>Vendor Details</h1>
+<table>
+<tr><th>Serial Number</th><td>3</td></tr>
+<tr><th>Vendor Name</th><td>BARAKAH ENTERPRISES</td></tr>
+<tr><th>GSTIN</th><td>01AHOPY1754C1ZE</td></tr>
+<tr><th>PAN Number</th><td>AHOPY1754C</td></tr>
+<tr><th>Aadhaar Number</th><td>3147 3825 0888</td></tr>
+<tr><th>Mobile Number</th><td>7780854759</td></tr>
+<tr><th>Gender</th><td>Female</td></tr>
+<tr><th>District</th><td>Budgam</td></tr>
+<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
+<tr><th>IFSC Code</th><td>JAKAOSTREET</td></tr>
+<tr><th>Account Number</th><td>0067010100004517</td></tr>
+<tr><th>Account Name</th><td>BARAKAH ENTERPRISES</td></tr>
+</table>
+</div>
+
+<!-- ================= VENDOR 4 ================= -->
+<div class="vendor-page theme-3">
+<h1>Vendor Details</h1>
+<table>
+<tr><th>Serial Number</th><td>4</td></tr>
+<tr><th>Vendor Name</th><td>FATIMA GOODS AND SERVICES</td></tr>
+<tr><th>GSTIN</th><td>01AMOPB7256M1ZW</td></tr>
+<tr><th>PAN Number</th><td>AMOPB7256M</td></tr>
+<tr><th>Aadhaar Number</th><td>2756 8550 5044</td></tr>
+<tr><th>Mobile Number</th><td>7889417852</td></tr>
+<tr><th>Gender</th><td>Male</td></tr>
+<tr><th>District</th><td>Pulwama</td></tr>
+<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
+<tr><th>IFSC Code</th><td>JAKAOCHANPO</td></tr>
+<tr><th>Account Number</th><td>0200010100003123</td></tr>
+<tr><th>Account Name</th><td>FATIMA GOODS AND SERVICES</td></tr>
+</table>
+</div>
+
+<!-- ================= VENDOR 5 ================= -->
+<div class="vendor-page theme-4">
+<h1>Vendor Details</h1>
+<table>
+<tr><th>Serial Number</th><td>5</td></tr>
+<tr><th>Vendor Name</th><td>PINNACLE ENTERPRISES</td></tr>
+<tr><th>GSTIN</th><td>01AWOPY3084E1ZC</td></tr>
+<tr><th>PAN Number</th><td>AWOPY3084E</td></tr>
+<tr><th>Aadhaar Number</th><td>4355 9800 6715</td></tr>
+<tr><th>Mobile Number</th><td>7889830330</td></tr>
+<tr><th>Gender</th><td>Female</td></tr>
+<tr><th>District</th><td>Srinagar</td></tr>
+<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
+<tr><th>IFSC Code</th><td>JAKAOBOTSHA</td></tr>
+<tr><th>Account Number</th><td>0346010100006145</td></tr>
+<tr><th>Account Name</th><td>PINNACLE ENTERPRISES</td></tr>
+</table>
+</div>
+
+<!-- ================= VENDOR 6 ================= -->
+<div class="vendor-page theme-5">
+<h1>Vendor Details</h1>
+<table>
+<tr><th>Serial Number</th><td>6</td></tr>
+<tr><th>Vendor Name</th><td>RADIANT TECHNOLOGY</td></tr>
+<tr><th>GSTIN</th><td>01CUJPR2547C1ZW</td></tr>
+<tr><th>PAN Number</th><td>CUJPR2547C</td></tr>
+<tr><th>Aadhaar Number</th><td>7795 3061 4983</td></tr>
+<tr><th>Mobile Number</th><td>8082759165</td></tr>
+<tr><th>Gender</th><td>Male</td></tr>
+<tr><th>District</th><td>Srinagar</td></tr>
+<tr><th>Bank Name</th><td>State Bank of India</td></tr>
+<tr><th>IFSC Code</th><td>SBIN0002384</td></tr>
+<tr><th>Account Number</th><td>41762703013</td></tr>
+<tr><th>Account Name</th><td>RADIANT TECHNOLOGY</td></tr>
+</table>
+</div>
+
+<!-- ================= VENDOR 7 ================= -->
+<div class="vendor-page theme-6">
+<h1>Vendor Details</h1>
+<table>
+<tr><th>Serial Number</th><td>7</td></tr>
+<tr><th>Vendor Name</th><td>SAALIM ENTERPRISES</td></tr>
+<tr><th>GSTIN</th><td>01AJFPH2666H1ZK</td></tr>
+<tr><th>PAN Number</th><td>AJFPH2666H</td></tr>
+<tr><th>Aadhaar Number</th><td>3894 2864 4853</td></tr>
+<tr><th>Mobile Number</th><td>9796551055</td></tr>
+<tr><th>Gender</th><td>Male</td></tr>
+<tr><th>District</th><td>Srinagar</td></tr>
+<tr><th>Bank Name</th><td>Jammu and Kashmir Bank</td></tr>
+<tr><th>IFSC Code</th><td>JAKAOCOLLEG</td></tr>
+<tr><th>Account Number</th><td>0363020100000415</td></tr>
+<tr><th>Account Name</th><td>SAALIM ENTERPRISES</td></tr>
+</table>
+</div>
+
+<!-- ================= VENDOR 8 ================= -->
+<div class="vendor-page theme-7">
+<h1>Vendor Details</h1>
+<table>
+<tr><th>Serial Number</th><td>8</td></tr>
+<tr><th>Vendor Name</th><td>IFAAN CORPORATION</td></tr>
+<tr><th>GSTIN</th><td>01CCOPM1433R1ZB</td></tr>
+<tr><th>PAN Number</th><td>CCOPM1433R</td></tr>
+<tr><th>Aadhaar Number</th><td>4627 2210 8563</td></tr>
+<tr><th>Mobile Number</th><td>7006453330</td></tr>
+<tr><th>Gender</th><td>Male</td></tr>
+<tr><th>District</th><td>Bandipora</td></tr>
+<tr><th>Bank Name</th><td>Jammu and Kashmir Grameen Bank</td></tr>
+<tr><th>IFSC Code</th><td>JAKAOGRAMEN</td></tr>
+<tr><th>Account Number</th><td>3532010100000317</td></tr>
+<tr><th>Account Name</th><td>IFAAN CORPORATION</td></tr>
+</table>
+</div>
+
+</body>
+</html>
